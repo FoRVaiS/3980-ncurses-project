@@ -1,1 +1,1 @@
-client
+client src/main.c src/game.c include/game.h
