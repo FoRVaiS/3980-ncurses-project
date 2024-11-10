@@ -1,6 +1,7 @@
 #include "game.h"
+#include "scene-component.h"
+#include "window.h"
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>
 #include <time.h>
@@ -20,14 +21,34 @@ void update(const Game *game)
 
 void tick(Game *game, long long ms)
 {
+    SceneComponent *panel;
+
     (void)game;
     (void)ms;
+
+    panel = window_get_focused_panel(game->window);
+
+    if(panel != NULL && panel->win != NULL)
+    {
+        mvwprintw(panel->win, 1, 1, "Terminal Dimensions: %d x %d", game->window->width, game->window->height);
+    }
+
+    window_update(game->window);
 }
 
 // ============================
 Game *game_init(int ticks, int *err)
 {
-    Game *game;
+    Game   *game;
+    Window *window;
+
+    window = window_init(err);
+    if(window == NULL)
+    {
+        game = NULL;
+        fprintf(stderr, "Game: Failed to initialize Window.\n");
+        goto exit;
+    }
 
     game = (Game *)calloc(1, sizeof(Game));
     if(game == NULL)
@@ -37,7 +58,8 @@ Game *game_init(int ticks, int *err)
         goto exit;
     }
 
-    game->ticks = ticks;
+    game->window = window;
+    game->ticks  = ticks;
 
 exit:
     return game;
@@ -46,6 +68,8 @@ exit:
 void game_destroy(void *vgame)
 {
     Game *game = (Game *)vgame;
+
+    window_destroy(game->window);
 
     memset(game, 0, sizeof(Game));
     free(game);

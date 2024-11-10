@@ -1,1 +1,1 @@
-client src/main.c src/vector.c include/vector.h src/game.c include/game.h
+client src/main.c src/vector.c include/vector.h src/game.c include/game.h src/window.c include/window.h src/scene.c include/scene.h src/scene-component.c include/scene-component.h ncurses

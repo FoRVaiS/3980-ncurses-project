@@ -2,6 +2,7 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "window.h"
 #include <stdbool.h>
 
 typedef enum
@@ -13,6 +14,8 @@ typedef struct
 {
     int  ticks;
     bool running;
+
+    Window *window;
 } Game;
 
 Game *game_init(int ticks, int *err);
