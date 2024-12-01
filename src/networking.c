@@ -104,8 +104,8 @@ int server_read_packet(Server *server, ServerPacketHandlerFn on_packet, int *err
         offset = 0;
         deserialize_header(&header, packet, &offset);
 
-        // Set client's player id
-        if(server_find_client_by_address(server, &client.conn.addr, &client.player_id) >= 0)
+        // Update packet history for existing clients
+        if(server_find_client_by_address(server, &client.conn.addr, &client.player_id) > 0)
         {
             PacketHeader storedHeader = client.history[header.payload_type];
             client                    = server->clients[client.player_id];
