@@ -90,17 +90,11 @@ int server_read_packet(Server *server, ServerPacketHandlerFn on_packet, int *err
         uint8_t     *packet;
 
         Client client;
-
-        err = 0;
-        if(client_init(&client, NULL, 0, err) < 0)
-        {
-            retval = -2;
-            goto exit;
-        }
+        client.conn.addr_len = sizeof(struct sockaddr_in);
 
         // Get packet
         *err = 0;
-        if(read_packet(server->conn.sockfd, &packet, &client.conn.addr, &client.conn.addr_len, err) == -2)
+        if(read_packet(server->conn.sockfd, &packet, &client.conn.addr, &client.conn.addr_len, err) < 0)
         {
             retval = -3;
             goto exit;
