@@ -41,6 +41,7 @@ void server_destroy(Server *server);
 int  server_read_packet(Server *server, ServerPacketHandlerFn on_packet, int *err);
 void server_send_packet(Server *server, const uint8_t *packet, uint8_t player_id, int *err);
 void server_send_packet_all(Server *server, const uint8_t *packet, int *err);
+void server_send_packet_all_except(Server *server, const uint8_t *packet, uint8_t player_id, int *err);
 int  server_find_client_by_address(Server *server, const struct sockaddr_in *addr, uint8_t *client_idx);
 void server_add_player(Server *server, const Connection *conn);
 

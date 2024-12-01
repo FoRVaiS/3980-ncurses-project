@@ -62,6 +62,17 @@ void server_send_packet_all(Server *server, const uint8_t *packet, int *err)
     }
 }
 
+void server_send_packet_all_except(Server *server, const uint8_t *packet, uint8_t player_id, int *err)
+{
+    for(size_t _player_id = 0; _player_id < server->nclients; _player_id++)
+    {
+        if(_player_id != player_id)
+        {
+            server_send_packet(server, packet, player_id, err);
+        }
+    }
+}
+
 int server_read_packet(Server *server, ServerPacketHandlerFn on_packet, int *err)
 {
     int retval;
