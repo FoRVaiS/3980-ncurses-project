@@ -56,6 +56,29 @@ int main(void)
             retval = EXIT_FAILURE;
             goto cleanup;
         }
+
+        if(client.player_id != SERVER_MAX_CLIENTS)
+        {
+            uint8_t                       *bytes_position;
+            EntityComponentPacketHeader    component_header;
+            EntityTransformComponentPacket etc_packet;
+
+            EntityTransformComponent transform_component = {1, 2, 3};
+
+            packet_create_entity_transform_component(&etc_packet, &packet_header, &component_header, client.conn.packet_id, client.player_id, &transform_component);
+            serialize_entity_transform_component(&bytes_position, &etc_packet);
+            connection_update_packet_id(&client.conn, &packet_header);
+
+            err = 0;
+            if(client_send_packet(&client, bytes_position, &err) < 0)
+            {
+                perror("client_send_packet");
+            };
+
+            free(bytes_position);
+
+            sleep(1);
+        }
     }
 
     retval = EXIT_SUCCESS;
