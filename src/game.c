@@ -34,6 +34,15 @@ void tick(Game *game, long long ms)
     }
 
     window_update(game->window);
+
+    if(game->selected_level != NULL)
+    {
+        const Level  *level    = game->selected_level;
+        const Entity *entities = level->entities;
+
+        // pass entities to systems
+        (void)entities;
+    }
 }
 
 // ============================
@@ -61,6 +70,8 @@ Game *game_init(int ticks, int *err)
     game->window = window;
     game->ticks  = ticks;
 
+    game_select_level(game, 0);    // Redundant but being explicit
+
 exit:
     return game;
 }
@@ -73,6 +84,30 @@ void game_destroy(void *vgame)
 
     memset(game, 0, sizeof(Game));
     free(game);
+}
+
+int game_add_level(Game *game, const Level *level)
+{
+    if(game->nlevels < GAME_MAX_LEVELS)
+    {
+        memcpy(&game->levels[game->nlevels], level, sizeof(Level));
+        game->nlevels++;
+        return 0;
+    }
+
+    return -1;
+}
+
+void game_select_level(Game *game, uint8_t level_idx)
+{
+    if(level_idx > 0 && level_idx < game->nlevels)
+    {
+        game->selected_level = &game->levels[level_idx];
+    }
+    else
+    {
+        game->selected_level = NULL;
+    }
 }
 
 void game_start(Game *game)
