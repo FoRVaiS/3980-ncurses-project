@@ -83,6 +83,9 @@ static void on_packet(Client *client, const uint8_t *packet)
 
         printf("PACKET[%zu bytes/%ld]: Player (%d) is %s\n", header.payload_size + sizeof(PacketHeader), (long)header.packet_timestamp, player_state_packet.player_id, player_state_packet.state == 0 ? "leaving..." : "joining!");
 
-        client->player_id = player_state_packet.player_id;
+        if(client->player_id == SERVER_MAX_CLIENTS)
+        {
+            client->player_id = player_state_packet.player_id;
+        }
     }
 }
