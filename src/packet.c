@@ -21,8 +21,8 @@ void packet_get_entity_component_header(EntityComponentPacketHeader *header, con
 {
     size_t offset = 0;
 
-    memcpy(&header->player_id, &bytes[offset], sizeof(header->player_id));
-    offset += sizeof(header->player_id);
+    memcpy(&header->entity_id, &bytes[offset], sizeof(header->entity_id));
+    offset += sizeof(header->entity_id);
 
     memcpy(&header->component_type, &bytes[offset], sizeof(header->component_type));
     offset += sizeof(header->component_type);
@@ -38,9 +38,9 @@ void packet_create_header(PacketHeader *header, uint8_t packet_id, uint8_t paylo
     header->packet_timestamp = packet_timestamp;
 }
 
-void packet_create_entity_component_header(EntityComponentPacketHeader *header, uint8_t player_id, uint8_t component_type, uint16_t component_size)
+void packet_create_entity_component_header(EntityComponentPacketHeader *header, uint8_t entity_id, uint8_t component_type, uint16_t component_size)
 {
-    header->player_id      = player_id;
+    header->entity_id      = entity_id;
     header->component_type = component_type;
     header->component_size = component_size;
 }
@@ -51,23 +51,22 @@ void packet_create_connect(ConnectPacket *packet, PacketHeader *packet_header, u
     memcpy(&packet->packet_header, packet_header, sizeof(packet->packet_header));
 }
 
-void packet_create_player_state(PlayerStatePacket *packet, PacketHeader *packet_header, uint8_t packet_id, uint8_t player_id, uint8_t state)
+void packet_create_player_state(PlayerStatePacket *packet, PacketHeader *packet_header, uint8_t packet_id, uint8_t state)
 {
     uint16_t payload_size = sizeof(PlayerStatePacket) - sizeof(PacketHeader);
 
     packet_create_header(packet_header, packet_id, PAYLOAD_PLAYER_STATE, payload_size, (uint32_t)get_time_ms());
     memcpy(&packet->packet_header, packet_header, sizeof(packet->packet_header));
-    packet->player_id = player_id;
-    packet->state     = state;
+    packet->state = state;
 }
 
-void packet_create_entity_transform_component(EntityTransformComponentPacket *packet, PacketHeader *packet_header, EntityComponentPacketHeader *component_header, uint8_t packet_id, uint8_t player_id, const EntityTransformComponent *component)
+void packet_create_entity_transform_component(EntityTransformComponentPacket *packet, PacketHeader *packet_header, EntityComponentPacketHeader *component_header, uint8_t packet_id, uint8_t entity_id, const EntityTransformComponent *component)
 {
     uint16_t payload_size   = sizeof(EntityTransformComponentPacket) - sizeof(PacketHeader);
     uint16_t component_size = sizeof(EntityTransformComponentPacket) - sizeof(PacketHeader) - sizeof(EntityComponentPacketHeader);
 
     packet_create_header(packet_header, packet_id, PAYLOAD_COMPONENT, payload_size, (uint32_t)get_time_ms());
-    packet_create_entity_component_header(component_header, player_id, COMPONENT_TRANSFORM, component_size);
+    packet_create_entity_component_header(component_header, entity_id, COMPONENT_TRANSFORM, component_size);
     memcpy(&packet->packet_header, packet_header, sizeof(packet->packet_header));
     memcpy(&packet->component_header, component_header, sizeof(packet->component_header));
     memcpy(&packet->component, component, sizeof(packet->component));
@@ -111,7 +110,7 @@ void serialize_header(uint8_t *bytes, size_t *offset, const PacketHeader *header
 
 void serialize_entity_component_header(uint8_t *bytes, size_t *offset, const EntityComponentPacketHeader *header)
 {
-    serialize_1_byte(bytes, offset, header->player_id);
+    serialize_1_byte(bytes, offset, header->entity_id);
     serialize_1_byte(bytes, offset, header->component_type);
     serialize_2_bytes(bytes, offset, header->component_size);
 }
@@ -152,7 +151,6 @@ int serialize_player_state(uint8_t **bytes, PlayerStatePacket *packet)
 
     offset = 0;
     serialize_header(*bytes, &offset, &packet->packet_header);
-    serialize_1_byte(*bytes, &offset, packet->player_id);
     serialize_1_byte(*bytes, &offset, packet->state);
 
     retval = 0;
@@ -205,15 +203,15 @@ void deserialize_header(PacketHeader *header, const uint8_t *bytes, size_t *offs
 
 void deserialize_entity_component_header(EntityComponentPacketHeader *header, const uint8_t *bytes, size_t *offset)
 {
-    uint8_t  player_id;
+    uint8_t  entity_id;
     uint8_t  component_type;
     uint16_t component_size;
 
-    player_id      = deserialize_1_byte(bytes, offset);
+    entity_id      = deserialize_1_byte(bytes, offset);
     component_type = deserialize_1_byte(bytes, offset);
     component_size = deserialize_2_bytes(bytes, offset);
 
-    packet_create_entity_component_header(header, player_id, component_type, component_size);
+    packet_create_entity_component_header(header, entity_id, component_type, component_size);
 }
 
 void deserialize_connect(ConnectPacket *packet, const uint8_t *bytes)
@@ -240,8 +238,7 @@ void deserialize_player_state(PlayerStatePacket *packet, const uint8_t *bytes)
     memcpy(&packet->packet_header, &packet_header, sizeof(PacketHeader));
 
     // Player State
-    packet->player_id = deserialize_1_byte(bytes, &offset);
-    packet->state     = deserialize_1_byte(bytes, &offset);
+    packet->state = deserialize_1_byte(bytes, &offset);
 }
 
 void deserialize_entity_transform_component(EntityTransformComponentPacket *packet, const uint8_t *bytes)

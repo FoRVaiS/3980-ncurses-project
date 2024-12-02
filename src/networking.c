@@ -47,28 +47,28 @@ void server_destroy(Server *server)
     memset(server, 0, sizeof(Server));
 }
 
-void server_send_packet(Server *server, const uint8_t *packet, uint8_t player_id, int *err)
+void server_send_packet(Server *server, const uint8_t *packet, uint8_t client_id, int *err)
 {
-    Client *client = &server->clients[player_id];
+    Client *client = &server->clients[client_id];
 
     send_packet(server->conn.sockfd, packet, &client->conn.addr, &client->conn.addr_len, err);
 }
 
 void server_send_packet_all(Server *server, const uint8_t *packet, int *err)
 {
-    for(size_t player_id = 0; player_id < server->nclients; player_id++)
+    for(size_t client_id = 0; client_id < server->nclients; client_id++)
     {
-        server_send_packet(server, packet, (uint8_t)player_id, err);
+        server_send_packet(server, packet, (uint8_t)client_id, err);
     }
 }
 
-void server_send_packet_all_except(Server *server, const uint8_t *packet, uint8_t player_id, int *err)
+void server_send_packet_all_except(Server *server, const uint8_t *packet, uint8_t client_id, int *err)
 {
-    for(size_t _player_id = 0; _player_id < server->nclients; _player_id++)
+    for(uint8_t _client_id = 0; _client_id < server->nclients; _client_id++)
     {
-        if(_player_id != player_id)
+        if(_client_id != client_id)
         {
-            server_send_packet(server, packet, player_id, err);
+            server_send_packet(server, packet, _client_id, err);
         }
     }
 }
@@ -100,7 +100,8 @@ int server_read_packet(Server *server, ServerPacketHandlerFn on_packet, int *err
         PacketHeader header;
         uint8_t     *packet;
 
-        Client client;
+        uint8_t client_idx;
+        Client  client;
         client.conn.addr_len = sizeof(struct sockaddr_in);
 
         // Get packet
@@ -116,10 +117,11 @@ int server_read_packet(Server *server, ServerPacketHandlerFn on_packet, int *err
         deserialize_header(&header, packet, &offset);
 
         // Update packet history for existing clients
-        if(server_find_client_by_address(server, &client.conn.addr, &client.player_id) > 0)
+        client_idx = 0;
+        if(server_find_client_by_address(server, &client.conn.addr, &client_idx) > 0)
         {
             PacketHeader storedHeader = client.history[header.payload_type];
-            client                    = server->clients[client.player_id];
+            client                    = server->clients[client_idx];
 
             // Drop if packet is older than the last record packet
             if(packet_validate_order(&header, &storedHeader) < 0)
@@ -176,7 +178,6 @@ void server_add_player(Server *server, const Connection *conn)
 int client_init(Client *client, char *addr, in_port_t port, int *err)
 {
     memset(client, 0, sizeof(Client));
-    client->player_id = (uint8_t)SERVER_MAX_CLIENTS;
 
     *err = 0;
     if(connection_init(&client->conn, addr, port, err) < 0)
