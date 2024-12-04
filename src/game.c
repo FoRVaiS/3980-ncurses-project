@@ -132,7 +132,7 @@ int game_add_level(Game *game, const Level *level)
 
 void game_select_level(Game *game, uint8_t level_idx)
 {
-    if(level_idx > 0 && level_idx < game->nlevels)
+    if(level_idx < game->nlevels)
     {
         game->selected_level = &game->levels[level_idx];
     }
