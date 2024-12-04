@@ -17,6 +17,7 @@ typedef struct
 
 SceneComponent *scene_component_create(int x, int y, int width, int height);
 void            scene_component_destroy(void *vcomponent);
+void            scene_component_redraw(const SceneComponent *component);
 void            scene_component_update(const SceneComponent *component);
 void            scene_component_clear(const SceneComponent *component);
 void            scene_component_refresh(const SceneComponent *component);
