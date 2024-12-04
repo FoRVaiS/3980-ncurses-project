@@ -1,6 +1,7 @@
 #include "game.h"
 #include "entity-component.h"
 #include "entity.h"
+#include "input.h"
 #include "level.h"
 #include "scene-component.h"
 #include "systems.h"
@@ -92,7 +93,7 @@ Game *game_init(int ticks, int *err)
     game->window = window;
     game->ticks  = ticks;
 
-    if(entity_create_player(&player, 4, 4, '#') < 0)
+    if(entity_create_player(&player, 4, 4, '#', get_input_device()) < 0)
     {
         fprintf(stderr, "Game: Failed to create player.\n");
         *err = GAME_ERR_PLAYER_CREATION_FAILED;

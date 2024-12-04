@@ -38,7 +38,14 @@ EntityComponent *entity_component_icon_create(uint16_t symbol)
 
 EntityComponent *entity_component_player_controller_create(Device *device)
 {
-    EntityPlayerControllerComponent *controller = (EntityPlayerControllerComponent *)malloc(sizeof(EntityPlayerControllerComponent));
+    EntityPlayerControllerComponent *controller;
+
+    if(device == NULL)
+    {
+        return NULL;
+    }
+
+    controller = (EntityPlayerControllerComponent *)malloc(sizeof(EntityPlayerControllerComponent));
     if(controller == NULL)
     {
         return NULL;

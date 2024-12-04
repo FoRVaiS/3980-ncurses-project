@@ -4,30 +4,30 @@
 #include <stdlib.h>
 #include <string.h>
 
-int entity_create_player(Entity *entity, uint8_t x, uint8_t y, uint16_t symbol)
+int entity_create_player(Entity *entity, uint8_t x, uint8_t y, uint16_t symbol, Device *device)
 {
     int retval;
 
     EntityComponent *transform  = entity_component_transform_create(x, y);
     EntityComponent *icon       = entity_component_icon_create(symbol);
-    EntityComponent *controller = entity_component_player_controller_create(get_input_device());
+    EntityComponent *controller = entity_component_player_controller_create(device);
 
     memset(entity, 0, sizeof(Entity));
     entity->type = ENTITY_TYPE_PLAYER;
 
-    if(entity_add_component(entity, transform) == -1)
+    if(entity_add_component(entity, transform) == -2)
     {
         retval = -1;
         goto cleanup;
     }
 
-    if(entity_add_component(entity, icon) == -1)
+    if(entity_add_component(entity, icon) == -2)
     {
         retval = -1;
         goto cleanup;
     }
 
-    if(entity_add_component(entity, controller) == -1)
+    if(entity_add_component(entity, controller) == -2)
     {
         retval = -1;
         goto cleanup;
@@ -39,6 +39,7 @@ int entity_create_player(Entity *entity, uint8_t x, uint8_t y, uint16_t symbol)
 cleanup:
     free(transform);
     free(icon);
+    free(controller);
 exit:
     return retval;
 }
@@ -53,6 +54,11 @@ void entity_destroy(Entity *entity)
 
 int entity_add_component(Entity *entity, EntityComponent *component)
 {
+    if(component == NULL)
+    {
+        return -1;
+    }
+
     if(entity->ncomponents < ENTITY_MAX_COMPONENTS)
     {
         entity->components[entity->ncomponents] = component;
@@ -60,7 +66,7 @@ int entity_add_component(Entity *entity, EntityComponent *component)
         return 0;
     }
 
-    return -1;
+    return -2;
 }
 
 int entity_find_component(Entity *entity, EntityComponent **component, EntityComponentType type)

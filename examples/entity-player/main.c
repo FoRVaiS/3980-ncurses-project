@@ -9,7 +9,7 @@ int main(void)
 
     Entity player;
 
-    if(entity_create_player(&player, 2, 3, '!') == -1)
+    if(entity_create_player(&player, 2, 3, '!', NULL) == -1)
     {
         retval = EXIT_FAILURE;
         goto exit;

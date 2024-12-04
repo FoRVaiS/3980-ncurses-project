@@ -18,7 +18,7 @@ typedef struct
     uint8_t          ncomponents;
 } Entity;
 
-int  entity_create_player(Entity *entity, uint8_t x, uint8_t y, uint16_t symbol);
+int  entity_create_player(Entity *entity, uint8_t x, uint8_t y, uint16_t symbol, Device *device);
 void entity_destroy(Entity *entity);
 
 int entity_add_component(Entity *entity, EntityComponent *component);
