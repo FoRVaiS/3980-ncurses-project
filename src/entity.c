@@ -1,5 +1,6 @@
 #include "entity.h"
 #include "entity-component.h"
+#include "input.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -7,8 +8,9 @@ int entity_create_player(Entity *entity, uint8_t ent_id, uint8_t x, uint8_t y, u
 {
     int retval;
 
-    EntityComponent *transform = entity_component_transform_create(x, y);
-    EntityComponent *icon      = entity_component_icon_create(symbol);
+    EntityComponent *transform  = entity_component_transform_create(x, y);
+    EntityComponent *icon       = entity_component_icon_create(symbol);
+    EntityComponent *controller = entity_component_player_controller_create(get_input_device());
 
     memset(entity, 0, sizeof(Entity));
     entity->id   = ent_id;
@@ -21,6 +23,12 @@ int entity_create_player(Entity *entity, uint8_t ent_id, uint8_t x, uint8_t y, u
     }
 
     if(entity_add_component(entity, icon) == -1)
+    {
+        retval = -1;
+        goto cleanup;
+    }
+
+    if(entity_add_component(entity, controller) == -1)
     {
         retval = -1;
         goto cleanup;
