@@ -1,5 +1,9 @@
 #include "game.h"
+#include "entity-component.h"
+#include "entity.h"
+#include "level.h"
 #include "scene-component.h"
+#include "systems.h"
 #include "window.h"
 #include <stdio.h>
 #include <string.h>
@@ -16,7 +20,14 @@ static void tick(Game *game, long long ms);
 
 void update(const Game *game)
 {
-    (void)game;
+    if(game->selected_level != NULL)
+    {
+        Level  *level     = game->selected_level;
+        Entity *entities  = level->entities;
+        uint8_t nentities = level->nentities;
+
+        input_process(entities, nentities);
+    }
 }
 
 void tick(Game *game, long long ms)
@@ -27,21 +38,29 @@ void tick(Game *game, long long ms)
     (void)ms;
 
     panel = window_get_focused_panel(game->window);
-
-    if(panel != NULL && panel->win != NULL)
+    if(panel == NULL || panel->win == NULL)
     {
-        mvwprintw(panel->win, 1, 1, "Terminal Dimensions: %d x %d", game->window->width, game->window->height);
+        return;
     }
 
+    mvwprintw(panel->win, 1, 1, "Terminal Dimensions: %d x %d", game->window->width, game->window->height);
     window_update(game->window);
 
+    // Run Systems
     if(game->selected_level != NULL)
     {
-        const Level  *level    = game->selected_level;
-        const Entity *entities = level->entities;
+        Level  *level     = game->selected_level;
+        Entity *entities  = level->entities;
+        uint8_t nentities = level->nentities;
 
-        // pass entities to systems
-        (void)entities;
+        Entity                   *player = &entities[0];
+        EntityTransformComponent *player_transform;
+
+        movement_system_process(entities, nentities);
+
+        // Get player coords
+        entity_find_component(player, (EntityComponent **)&player_transform, ENTITY_COMPONENT_TRANSFORM);
+        mvwprintw(panel->win, 2, 1, "Player -> (%d, %d)", player_transform->x, player_transform->y);
     }
 }
 
@@ -50,6 +69,9 @@ Game *game_init(int ticks, int *err)
 {
     Game   *game;
     Window *window;
+
+    Level  level;
+    Entity player;
 
     window = window_init(err);
     if(window == NULL)
@@ -70,6 +92,16 @@ Game *game_init(int ticks, int *err)
     game->window = window;
     game->ticks  = ticks;
 
+    if(entity_create_player(&player, 0, 4, 4, '#') < 0)
+    {
+        fprintf(stderr, "Game: Failed to create player.\n");
+        *err = GAME_ERR_PLAYER_CREATION_FAILED;
+        goto exit;
+    }
+
+    level_init(&level);
+    level_add_entity(&level, &player);
+    game_add_level(game, &level);
     game_select_level(game, 0);    // Redundant but being explicit
 
 exit:

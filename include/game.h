@@ -10,7 +10,8 @@
 
 typedef enum
 {
-    GAME_ERR_CALLOC
+    GAME_ERR_CALLOC,
+    GAME_ERR_PLAYER_CREATION_FAILED,
 } GameErrors;
 
 typedef struct
