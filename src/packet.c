@@ -1,4 +1,5 @@
 #include "packet.h"
+#include "entity-component.h"
 #include "utils.h"
 #include <arpa/inet.h>
 #include <stdint.h>
@@ -66,7 +67,7 @@ void packet_create_entity_transform_component(EntityTransformComponentPacket *pa
     uint16_t component_size = sizeof(EntityTransformComponentPacket) - sizeof(PacketHeader) - sizeof(EntityComponentPacketHeader);
 
     packet_create_header(packet_header, packet_id, PAYLOAD_COMPONENT, payload_size, (uint32_t)get_time_ms());
-    packet_create_entity_component_header(component_header, entity_id, COMPONENT_TRANSFORM, component_size);
+    packet_create_entity_component_header(component_header, entity_id, ENTITY_COMPONENT_TRANSFORM, component_size);
     memcpy(&packet->packet_header, packet_header, sizeof(packet->packet_header));
     memcpy(&packet->component_header, component_header, sizeof(packet->component_header));
     memcpy(&packet->component, component, sizeof(packet->component));
@@ -176,7 +177,6 @@ int serialize_entity_transform_component(uint8_t **bytes, EntityTransformCompone
     serialize_entity_component_header(*bytes, &offset, &packet->component_header);
     serialize_1_byte(*bytes, &offset, packet->component.x);
     serialize_1_byte(*bytes, &offset, packet->component.y);
-    serialize_1_byte(*bytes, &offset, packet->component.angle);
 
     retval = 0;
 exit:
@@ -259,9 +259,8 @@ void deserialize_entity_transform_component(EntityTransformComponentPacket *pack
     memcpy(&packet->component_header, &component_header, sizeof(EntityComponentPacketHeader));
 
     // Transform Component
-    packet->component.x     = deserialize_1_byte(bytes, &offset);
-    packet->component.y     = deserialize_1_byte(bytes, &offset);
-    packet->component.angle = deserialize_1_byte(bytes, &offset);
+    packet->component.x = deserialize_1_byte(bytes, &offset);
+    packet->component.y = deserialize_1_byte(bytes, &offset);
 }
 
 // =========================

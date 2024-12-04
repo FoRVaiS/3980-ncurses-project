@@ -1,6 +1,7 @@
 #ifndef PACKET_H
 #define PACKET_H
 
+#include "entity-component.h"
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -17,28 +18,6 @@ typedef enum
     PAYLOAD_COMPONENT,
     PAYLOAD_TYPE_LEN,
 } PayloadType;
-
-/**
- *  Only components that are required to be shared
- *  with other clients should be included.
- */
-typedef enum
-{
-    COMPONENT_TRANSFORM = 0,
-} ComponentType;
-
-//
-// === PRETEND THIS IS DEFINED IN ENTITY-COMPONENTS HEADER ===
-// TODO: Move EntityTransformComponent to proper header file
-typedef struct
-
-{
-    uint8_t x;
-    uint8_t y;
-    uint8_t angle;
-} EntityTransformComponent;
-
-// ===========================================================
 
 // HEADERS
 typedef struct
