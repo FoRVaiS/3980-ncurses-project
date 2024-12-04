@@ -9,13 +9,13 @@ int main(void)
 
     Entity player;
 
-    if(entity_create_player(&player, 1, 2, 3, '!') == -1)
+    if(entity_create_player(&player, 2, 3, '!') == -1)
     {
         retval = EXIT_FAILURE;
         goto exit;
     }
 
-    printf("Ent Type: %d | Ent Id: %d\n", (int)player.type, player.id);
+    printf("Ent Type: %d\n", (int)player.type);
     for(uint8_t comp_id = 0; comp_id < player.ncomponents; comp_id++)
     {
         EntityComponent *component = player.components[comp_id];

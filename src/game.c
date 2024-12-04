@@ -92,7 +92,7 @@ Game *game_init(int ticks, int *err)
     game->window = window;
     game->ticks  = ticks;
 
-    if(entity_create_player(&player, 0, 4, 4, '#') < 0)
+    if(entity_create_player(&player, 4, 4, '#') < 0)
     {
         fprintf(stderr, "Game: Failed to create player.\n");
         *err = GAME_ERR_PLAYER_CREATION_FAILED;

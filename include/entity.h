@@ -12,14 +12,13 @@ typedef enum
 
 typedef struct
 {
-    uint8_t    id;
     EntityType type;
 
     EntityComponent *components[ENTITY_MAX_COMPONENTS];
     uint8_t          ncomponents;
 } Entity;
 
-int  entity_create_player(Entity *entity, uint8_t ent_id, uint8_t x, uint8_t y, uint16_t symbol);
+int  entity_create_player(Entity *entity, uint8_t x, uint8_t y, uint16_t symbol);
 void entity_destroy(Entity *entity);
 
 int entity_add_component(Entity *entity, EntityComponent *component);

@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int entity_create_player(Entity *entity, uint8_t ent_id, uint8_t x, uint8_t y, uint16_t symbol)
+int entity_create_player(Entity *entity, uint8_t x, uint8_t y, uint16_t symbol)
 {
     int retval;
 
@@ -13,7 +13,6 @@ int entity_create_player(Entity *entity, uint8_t ent_id, uint8_t x, uint8_t y, u
     EntityComponent *controller = entity_component_player_controller_create(get_input_device());
 
     memset(entity, 0, sizeof(Entity));
-    entity->id   = ent_id;
     entity->type = ENTITY_TYPE_PLAYER;
 
     if(entity_add_component(entity, transform) == -1)

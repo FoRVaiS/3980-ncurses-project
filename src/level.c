@@ -11,9 +11,12 @@ int level_add_entity(Level *level, const Entity *entity)
 {
     if(level->nentities < (LEVEL_MAX_ENTITIES - 1))
     {
-        memcpy(&level->entities[level->nentities], entity, sizeof(Entity));
+        uint8_t ent_id = level->nentities;
+
+        memcpy(&level->entities[ent_id], entity, sizeof(Entity));
         level->nentities++;
-        return 0;
+
+        return ent_id;
     }
 
     return -1;
