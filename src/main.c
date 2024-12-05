@@ -15,16 +15,28 @@ typedef struct
     in_port_t port;
 } thread_args_t;
 
+typedef struct
+{
+    char     *addr;
+    in_port_t port;
+    int       host;
+    int       connect;
+} Arguments;
+
+static int  get_arguments(Arguments *args, int argc, char *argv[], int *err);
+static void validate_arguments(const Arguments *args);
+
 static void  create_game_thread(pthread_t *thread, thread_args_t *targs);
 static void  create_server_thread(pthread_t *thread, thread_args_t *targs);
 static void *start_server(void *targs);
 static void *start_game(void *targs);
 static void  on_packet(Server *server, Client *client, const uint8_t *packet);
 
-int main(void)
+int main(int argc, char *argv[])
 {
     int err;
 
+    Arguments args;
 
     thread_args_t targs;
     pthread_t     game_thread;
@@ -32,6 +44,11 @@ int main(void)
 
     Server server;
 
+    memset(&args, 0, sizeof(Arguments));
+
+    err = 0;
+    get_arguments(&args, argc, argv, &err);
+    validate_arguments(&args);
 
     memset(&targs, 0, sizeof(thread_args_t));
     targs.addr   = args.addr;
