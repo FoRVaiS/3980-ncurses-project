@@ -39,8 +39,8 @@ int main(int argc, char *argv[])
     Arguments args;
 
     thread_args_t targs;
-    pthread_t     game_thread;
-    pthread_t     server_thread;
+    pthread_t     game_thread   = 0;
+    pthread_t     server_thread = 0;
 
     Server server;
 
