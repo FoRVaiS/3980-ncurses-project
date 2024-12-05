@@ -6,6 +6,7 @@
 #include "scene-component.h"
 #include "scene.h"
 #include "systems.h"
+#include "utils.h"
 #include "window.h"
 #include <stdio.h>
 #include <string.h>
@@ -15,7 +16,6 @@
 
 #define MS_PER_SEC 1000
 
-static long long get_time_ms(void);
 
 static void update(const Game *game);
 static void tick(Game *game, long long ms);
@@ -183,12 +183,4 @@ void game_loop(Game *game)
             tick(game, deltaTime);
         }
     }
-}
-
-static long long get_time_ms(void)
-{
-    struct timeval tv;
-
-    gettimeofday(&tv, NULL);
-    return (((long long)tv.tv_sec) * MS_PER_SEC) + (tv.tv_usec / MS_PER_SEC);
 }
