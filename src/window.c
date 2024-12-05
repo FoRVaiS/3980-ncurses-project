@@ -9,12 +9,12 @@
 #define GAME_SCENE_HEADER_X 0
 #define GAME_SCENE_HEADER_Y 0
 #define GAME_SCENE_HEADER_WIDTH (maxWidth - 30)
-#define GAME_SCENE_HEADER_HEIGHT 3
+#define GAME_SCENE_HEADER_HEIGHT 4
 
 #define GAME_SCENE_MAIN_X 0
-#define GAME_SCENE_MAIN_Y 3
+#define GAME_SCENE_MAIN_Y 4
 #define GAME_SCENE_MAIN_WIDTH (maxWidth - 30)
-#define GAME_SCENE_MAIN_HEIGHT (maxHeight - 3)
+#define GAME_SCENE_MAIN_HEIGHT (maxHeight - 4)
 
 #define GAME_SCENE_SIDE_X (maxWidth - 30)
 #define GAME_SCENE_SIDE_Y 0

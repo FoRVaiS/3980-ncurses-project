@@ -4,6 +4,7 @@
 #include "input.h"
 #include "level.h"
 #include "scene-component.h"
+#include "scene.h"
 #include "systems.h"
 #include "window.h"
 #include <stdio.h>
@@ -33,18 +34,24 @@ void update(const Game *game)
 
 void tick(Game *game, long long ms)
 {
-    SceneComponent *panel;
+    const Scene *scene;
+
+    const SceneComponent *main;
+    SceneComponent       *header;
 
     (void)game;
     (void)ms;
 
-    panel = window_get_focused_panel(game->window);
-    if(panel == NULL || panel->win == NULL)
+    main   = window_get_focused_panel(game->window);
+    scene  = window_get_scene(game->window, 0);
+    header = scene_get_component(scene, 0);
+
+    if(main == NULL || main->win == NULL || header == NULL || header->win == NULL)
     {
         return;
     }
 
-    mvwprintw(panel->win, 1, 1, "Terminal Dimensions: %d x %d", game->window->width, game->window->height);
+    mvwprintw(header->win, 1, 1, "Terminal Dimensions: %d x %d", game->window->width, game->window->height);
     window_update(game->window);
 
     // Run Systems
@@ -57,12 +64,12 @@ void tick(Game *game, long long ms)
         Entity                   *player = &entities[0];
         EntityTransformComponent *player_transform;
 
-        movement_system_process(entities, nentities, (uint8_t)(panel->width - 2), (uint8_t)(panel->height - 2));
-        render_process(panel, entities, nentities);
+        movement_system_process(entities, nentities, (uint8_t)(main->width - 2), (uint8_t)(main->height - 2));
+        render_process(main, entities, nentities);
 
         // Get player coords
         entity_find_component(player, (EntityComponent **)&player_transform, ENTITY_COMPONENT_TRANSFORM);
-        mvwprintw(panel->win, 2, 1, "Player -> (%d, %d)", player_transform->x, player_transform->y);
+        mvwprintw(header->win, 2, 1, "Player -> (%d, %d)", player_transform->x, player_transform->y);
     }
 }
 
