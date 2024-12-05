@@ -3,6 +3,7 @@
 #define GAME_H
 
 #include "level.h"
+#include "networking.h"
 #include "window.h"
 #include <stdbool.h>
 
@@ -20,13 +21,14 @@ typedef struct
     bool running;
 
     Window *window;
+    Client *client;
 
     Level   levels[GAME_MAX_LEVELS];
     uint8_t nlevels;
     Level  *selected_level;
 } Game;
 
-Game *game_init(int ticks, int *err);
+Game *game_init(Client *client, int ticks, int *err);
 void  game_destroy(void *vgame);
 
 int  game_add_level(Game *game, const Level *level);

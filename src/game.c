@@ -3,6 +3,8 @@
 #include "entity.h"
 #include "input.h"
 #include "level.h"
+#include "networking.h"
+#include "packet.h"
 #include "scene-component.h"
 #include "scene.h"
 #include "systems.h"
@@ -21,12 +23,18 @@
 #define P2X 70
 #define P2Y 50
 
-static void update(const Game *game);
+static void send_position_packets(Game *game, const EntityTransformComponent *component);
 static int  setup_level(Game *game, int *err);
+static void on_packet(Game *game, const uint8_t *packet);
+static void update(Game *game);
 static void tick(Game *game, long long ms);
 
-void update(const Game *game)
+void update(Game *game)
 {
+    int err;
+
+    uint8_t *packet;
+
     if(game->selected_level != NULL)
     {
         Level  *level     = game->selected_level;
@@ -34,6 +42,12 @@ void update(const Game *game)
         uint8_t nentities = level->nentities;
 
         input_process(entities, nentities);
+    }
+
+    err = 0;
+    if(client_read_packet(game->client, &packet, &err) == 1)
+    {
+        on_packet(game, packet);
     }
 }
 
@@ -80,11 +94,63 @@ void tick(Game *game, long long ms)
         entity_find_component(other_player, (EntityComponent **)&other_player_transform, ENTITY_COMPONENT_TRANSFORM);
         mvwprintw(header->win, 2, 1, "Player -> (%d, %d)", player_transform->x, player_transform->y);
         mvwprintw(header->win, 3, 1, "Other Player -> (%d, %d)", other_player_transform->x, other_player_transform->y);
+
+        send_position_packets(game, player_transform);
+    }
+}
+
+static void send_position_packets(Game *game, const EntityTransformComponent *component)
+{
+    int err;
+
+    uint8_t *bytes_transform;
+
+    PacketHeader                   header;
+    EntityComponentPacketHeader    component_header;
+    EntityTransformComponentPacket transform_packet;
+
+    packet_create_entity_transform_component(&transform_packet, &header, &component_header, game->client->conn.packet_id, component);
+    serialize_entity_transform_component(&bytes_transform, &transform_packet);
+    connection_update_packet_id(&game->client->conn, &header);
+
+    err = 0;
+    client_send_packet(game->client, bytes_transform, &err);
+
+    free(bytes_transform);
+}
+
+static void on_packet(Game *game, const uint8_t *packet)
+{
+    PacketHeader header;
+    size_t       offset;
+
+    offset = 0;
+    deserialize_header(&header, packet, &offset);
+
+    if(header.payload_type == PAYLOAD_COMPONENT)
+    {
+        EntityComponentPacketHeader component_header;
+        deserialize_entity_component_header(&component_header, packet, &offset);
+
+        if(component_header.component_type == ENTITY_COMPONENT_TRANSFORM)
+        {
+            Entity                   *other_player;
+            EntityTransformComponent *other_player_transform;
+
+            EntityTransformComponentPacket transform_packet;
+            deserialize_entity_transform_component(&transform_packet, packet);
+
+            other_player = &game->selected_level->entities[1];
+            entity_find_component(other_player, (EntityComponent **)&other_player_transform, ENTITY_COMPONENT_TRANSFORM);
+
+            other_player_transform->x = transform_packet.component.x;
+            other_player_transform->y = transform_packet.component.y;
+        }
     }
 }
 
 // ============================
-Game *game_init(int ticks, int *err)
+Game *game_init(Client *client, int ticks, int *err)
 {
     Game   *game;
     Window *window;
@@ -106,6 +172,7 @@ Game *game_init(int ticks, int *err)
     }
 
     game->window = window;
+    game->client = client;
     game->ticks  = ticks;
 
     if(setup_level(game, err) < 0)
@@ -150,8 +217,10 @@ static int setup_level(Game *game, int *err)
     game_add_level(game, &level);
     game_select_level(game, 0);    // Redundant but being explicit
 
+    retval = 0;
+
 exit:
-    return game;
+    return retval;
 }
 
 void game_destroy(void *vgame)
