@@ -2,6 +2,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_gamecontroller.h>
+#include <ncurses.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,19 +11,54 @@
 
 Device *get_input_device(void)
 {
-    Gamepad *gamepad = (Gamepad *)calloc(1, sizeof(Gamepad));
-    if(gamepad == NULL)
-    {
-        return NULL;
-    }
+    Gamepad  *gamepad;
+    Keyboard *keyboard;
 
-    if(gamepad_init(gamepad) >= 0)
+    gamepad = (Gamepad *)calloc(1, sizeof(Gamepad));
+    if(gamepad != NULL && gamepad_init(gamepad) >= 0)
     {
         return (Device *)gamepad;
     }
 
     free(gamepad);
+    keyboard = (Keyboard *)calloc(1, sizeof(Keyboard));
+    if(keyboard != NULL)
+    {
+        keyboard_init(keyboard);
+        return (Device *)keyboard;
+    }
+
     return NULL;
+}
+
+int keyboard_init(Keyboard *keyboard)
+{
+    nodelay(stdscr, TRUE);
+    noecho();
+
+    memset(keyboard, 0, sizeof(Keyboard));
+    keyboard->device.type = DEVICE_KEYBOARD;
+
+    return 0;
+}
+
+void keyboard_update(Keyboard *keyboard)
+{
+    int c = getch();
+
+    if((c - PRINTABLE_ASCII_OFFSET) >= 0 && (c - PRINTABLE_ASCII_OFFSET) < KEYBOARD_KEYS_LEN)
+    {
+        memset(keyboard->keys, 0, sizeof(uint8_t) * KEYBOARD_KEYS_LEN);
+        keyboard->keys[c - PRINTABLE_ASCII_OFFSET] = 1;
+    }
+}
+
+void keyboard_to_inputs(Keyboard *keyboard, Inputs *inputs)
+{
+    inputs->UP    = keyboard->keys[KB_KEY_W];
+    inputs->DOWN  = keyboard->keys[KB_KEY_S];
+    inputs->LEFT  = keyboard->keys[KB_KEY_A];
+    inputs->RIGHT = keyboard->keys[KB_KEY_D];
 }
 
 int gamepad_init(Gamepad *gamepad)

@@ -61,6 +61,12 @@ void input_process(Entity *entities, uint8_t nentities)
             gamepad_update((Gamepad *)controller->device);
             gamepad_to_inputs((Gamepad *)controller->device, &controller->inputs);
         }
+
+        if(controller->device->type == DEVICE_KEYBOARD)
+        {
+            keyboard_update((Keyboard *)controller->device);
+            keyboard_to_inputs((Keyboard *)controller->device, &controller->inputs);
+        }
     }
 }
 
