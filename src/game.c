@@ -16,8 +16,13 @@
 
 #define MS_PER_SEC 1000
 
+#define P1X 20
+#define P1Y 30
+#define P2X 70
+#define P2Y 50
 
 static void update(const Game *game);
+static int  setup_level(Game *game, int *err);
 static void tick(Game *game, long long ms);
 
 void update(const Game *game)
@@ -64,12 +69,17 @@ void tick(Game *game, long long ms)
         Entity                   *player = &entities[0];
         EntityTransformComponent *player_transform;
 
+        Entity                   *other_player = &entities[1];
+        EntityTransformComponent *other_player_transform;
+
         movement_system_process(entities, nentities, (uint8_t)(main->width - 2), (uint8_t)(main->height - 2));
         render_process(main, entities, nentities);
 
         // Get player coords
         entity_find_component(player, (EntityComponent **)&player_transform, ENTITY_COMPONENT_TRANSFORM);
+        entity_find_component(other_player, (EntityComponent **)&other_player_transform, ENTITY_COMPONENT_TRANSFORM);
         mvwprintw(header->win, 2, 1, "Player -> (%d, %d)", player_transform->x, player_transform->y);
+        mvwprintw(header->win, 3, 1, "Other Player -> (%d, %d)", other_player_transform->x, other_player_transform->y);
     }
 }
 
@@ -78,9 +88,6 @@ Game *game_init(int ticks, int *err)
 {
     Game   *game;
     Window *window;
-
-    Level  level;
-    Entity player;
 
     window = window_init(err);
     if(window == NULL)
@@ -101,15 +108,45 @@ Game *game_init(int ticks, int *err)
     game->window = window;
     game->ticks  = ticks;
 
-    if(entity_create_player(&player, 4, 4, '#', get_input_device()) < 0)
+    if(setup_level(game, err) < 0)
+    {
+        fprintf(stderr, "Game: Failed to create level.\n");
+        free(game);
+        game = NULL;
+        goto exit;
+    }
+
+exit:
+    return game;
+}
+
+static int setup_level(Game *game, int *err)
+{
+    int retval;
+
+    Level  level;
+    Entity player;
+    Entity otherPlayer;
+
+    if(entity_create_player(&player, P1X, P1Y, 'i', get_input_device()) < 0)
     {
         fprintf(stderr, "Game: Failed to create player.\n");
-        *err = GAME_ERR_PLAYER_CREATION_FAILED;
+        *err   = GAME_ERR_PLAYER_CREATION_FAILED;
+        retval = -1;
+        goto exit;
+    }
+
+    if(entity_create_player(&otherPlayer, P2X, P2Y, ';', NULL) < 0)
+    {
+        fprintf(stderr, "Game: Failed to create player.\n");
+        *err   = GAME_ERR_PLAYER_CREATION_FAILED;
+        retval = -2;
         goto exit;
     }
 
     level_init(&level);
     level_add_entity(&level, &player);
+    level_add_entity(&level, &otherPlayer);
     game_add_level(game, &level);
     game_select_level(game, 0);    // Redundant but being explicit
 
