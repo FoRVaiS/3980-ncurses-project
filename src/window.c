@@ -8,28 +8,23 @@
 
 #define GAME_SCENE_HEADER_X 0
 #define GAME_SCENE_HEADER_Y 0
-#define GAME_SCENE_HEADER_WIDTH maxWidth
+#define GAME_SCENE_HEADER_WIDTH 80
 #define GAME_SCENE_HEADER_HEIGHT 5
 
 #define GAME_SCENE_MAIN_X 0
 #define GAME_SCENE_MAIN_Y 5
-#define GAME_SCENE_MAIN_WIDTH maxWidth
-#define GAME_SCENE_MAIN_HEIGHT (maxHeight - 5)
+#define GAME_SCENE_MAIN_WIDTH 80
+#define GAME_SCENE_MAIN_HEIGHT (30 - 5)
 
-static int setup_scenes(Window *window, int maxWidth, int maxHeight, int *err);
+static int setup_scenes(Window *window, int *err);
 
 Window *window_init(int *err)
 {
     Window *window;
     Vector *scenes;
 
-    int maxWidth;
-    int maxHeight;
-
     initscr();
     curs_set(0);
-
-    getmaxyx(stdscr, maxHeight, maxWidth);
 
     scenes = vector_init(1, err);
     if(scenes == NULL)
@@ -48,10 +43,8 @@ Window *window_init(int *err)
 
     window->scenes           = scenes;
     window->focused_scene_id = -1;
-    window->width            = maxWidth;
-    window->height           = maxHeight;
 
-    if(setup_scenes(window, maxWidth, maxHeight, err) < 0)
+    if(setup_scenes(window, err) < 0)
     {
         fprintf(stderr, "Window: Failed to setup scenes.\n");
         window_destroy(window);
@@ -62,7 +55,7 @@ exit:
     return window;
 }
 
-static int setup_scenes(Window *window, int maxWidth, int maxHeight, int *err)
+static int setup_scenes(Window *window, int *err)
 {
     int retval = 0;
 

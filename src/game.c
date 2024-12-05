@@ -18,10 +18,10 @@
 
 #define MS_PER_SEC 1000
 
-#define P1X 20
-#define P1Y 30
-#define P2X 70
-#define P2Y 50
+#define P1X 10
+#define P1Y 10
+#define P2X 20
+#define P2Y 20
 
 static void send_position_packets(Game *game, const EntityTransformComponent *component);
 static int  setup_level(Game *game, int *err);
@@ -70,7 +70,7 @@ void tick(Game *game, long long ms)
         return;
     }
 
-    mvwprintw(header->win, 1, 1, "Terminal Dimensions: %d x %d", game->window->width, game->window->height);
+    mvwprintw(header->win, 1, 1, "Window Dimensions: %d x %d", main->width, main->height);
     window_update(game->window);
 
     // Run Systems
