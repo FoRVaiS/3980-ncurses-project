@@ -30,7 +30,6 @@ typedef struct
 
 typedef struct
 {
-    uint8_t  entity_id;
     uint8_t  component_type;
     uint16_t component_size;
 } EntityComponentPacketHeader;
@@ -58,11 +57,11 @@ void packet_get_header(PacketHeader *header, const uint8_t *bytes);
 void packet_get_entity_component_header(EntityComponentPacketHeader *header, const uint8_t *bytes);
 
 void packet_create_header(PacketHeader *header, uint8_t packet_id, uint8_t payload_type, uint16_t payload_size, uint32_t packet_timestamp);
-void packet_create_entity_component_header(EntityComponentPacketHeader *header, uint8_t entity_id, uint8_t component_type, uint16_t component_size);
+void packet_create_entity_component_header(EntityComponentPacketHeader *header, uint8_t component_type, uint16_t component_size);
 
 void packet_create_connect(ConnectPacket *packet, PacketHeader *packet_header, uint8_t packet_id);
 void packet_create_player_state(PlayerStatePacket *packet, PacketHeader *packet_header, uint8_t packet_id, uint8_t state);
-void packet_create_entity_transform_component(EntityTransformComponentPacket *packet, PacketHeader *packet_header, EntityComponentPacketHeader *component_header, uint8_t packet_id, uint8_t entity_id, const EntityTransformComponent *component);
+void packet_create_entity_transform_component(EntityTransformComponentPacket *packet, PacketHeader *packet_header, EntityComponentPacketHeader *component_header, uint8_t packet_id, const EntityTransformComponent *component);
 
 int packet_validate_order(const PacketHeader *newheader, const PacketHeader *oldheader);
 

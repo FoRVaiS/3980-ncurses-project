@@ -23,7 +23,7 @@ typedef struct
     Connection conn;
 
     PacketHeader history[PAYLOAD_TYPE_LEN];
-    uint8_t      owned_entity_ids[CLIENT_MAX_ENTITIES];
+    uint8_t      entity_id;
 } Client;
 
 typedef struct
