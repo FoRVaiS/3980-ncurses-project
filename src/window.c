@@ -8,18 +8,13 @@
 
 #define GAME_SCENE_HEADER_X 0
 #define GAME_SCENE_HEADER_Y 0
-#define GAME_SCENE_HEADER_WIDTH (maxWidth - 30)
-#define GAME_SCENE_HEADER_HEIGHT 4
+#define GAME_SCENE_HEADER_WIDTH maxWidth
+#define GAME_SCENE_HEADER_HEIGHT 5
 
 #define GAME_SCENE_MAIN_X 0
-#define GAME_SCENE_MAIN_Y 4
-#define GAME_SCENE_MAIN_WIDTH (maxWidth - 30)
-#define GAME_SCENE_MAIN_HEIGHT (maxHeight - 4)
-
-#define GAME_SCENE_SIDE_X (maxWidth - 30)
-#define GAME_SCENE_SIDE_Y 0
-#define GAME_SCENE_SIDE_WIDTH 30
-#define GAME_SCENE_SIDE_HEIGHT (maxHeight)
+#define GAME_SCENE_MAIN_Y 5
+#define GAME_SCENE_MAIN_WIDTH maxWidth
+#define GAME_SCENE_MAIN_HEIGHT (maxHeight - 5)
 
 static int setup_scenes(Window *window, int maxWidth, int maxHeight, int *err);
 
@@ -74,7 +69,6 @@ static int setup_scenes(Window *window, int maxWidth, int maxHeight, int *err)
     Scene          *game_scene;
     SceneComponent *game_scene_header;
     SceneComponent *game_scene_main;
-    SceneComponent *game_scene_side;
 
     *err       = 0;
     game_scene = scene_init(err);
@@ -87,10 +81,8 @@ static int setup_scenes(Window *window, int maxWidth, int maxHeight, int *err)
     // Game Scene
     game_scene_header = scene_component_create(GAME_SCENE_HEADER_X, GAME_SCENE_HEADER_Y, GAME_SCENE_HEADER_WIDTH, GAME_SCENE_HEADER_HEIGHT);
     game_scene_main   = scene_component_create(GAME_SCENE_MAIN_X, GAME_SCENE_MAIN_Y, GAME_SCENE_MAIN_WIDTH, GAME_SCENE_MAIN_HEIGHT);
-    game_scene_side   = scene_component_create(GAME_SCENE_SIDE_X, GAME_SCENE_SIDE_Y, GAME_SCENE_SIDE_WIDTH, GAME_SCENE_SIDE_HEIGHT);
     scene_add_component(game_scene, game_scene_header);
     scene_add_component(game_scene, game_scene_main);
-    scene_add_component(game_scene, game_scene_side);
     scene_focus_component(game_scene, 1);
 
     window_add_scene(window, game_scene);
