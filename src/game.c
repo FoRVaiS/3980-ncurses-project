@@ -58,6 +58,7 @@ void tick(Game *game, long long ms)
         EntityTransformComponent *player_transform;
 
         movement_system_process(entities, nentities);
+        render_process(panel, entities, nentities);
 
         // Get player coords
         entity_find_component(player, (EntityComponent **)&player_transform, ENTITY_COMPONENT_TRANSFORM);

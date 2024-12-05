@@ -21,5 +21,6 @@ void            scene_component_redraw(const SceneComponent *component);
 void            scene_component_update(const SceneComponent *component);
 void            scene_component_clear(const SceneComponent *component);
 void            scene_component_refresh(const SceneComponent *component);
+void            scene_component_render(const SceneComponent *component, int x, int y, chtype ch);
 
 #endif

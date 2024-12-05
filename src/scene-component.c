@@ -39,12 +39,12 @@ void scene_component_destroy(void *vcomponent)
 
 void scene_component_redraw(const SceneComponent *component)
 {
-    WINDOW *win     = component->win;
+    WINDOW *win      = component->win;
     int     currentW = getmaxx(component->win);
     int     currentH = getmaxy(component->win);
 
-    //current = the dimensions of the window currently (may be smaller due to terminal resize)
-    //component-> = the desired dimensions of the window
+    // current = the dimensions of the window currently (may be smaller due to terminal resize)
+    // component-> = the desired dimensions of the window
 
     mvwaddch(win, 0, 0, ACS_ULCORNER);
 
@@ -83,19 +83,23 @@ void scene_component_redraw(const SceneComponent *component)
 void scene_component_update(const SceneComponent *component)
 {
     scene_component_refresh(component);
-    if(wgetch(component->win) == KEY_RESIZE)
-    {
-        scene_component_redraw(component);
-    }
+    scene_component_redraw(component);
 }
 
 void scene_component_clear(const SceneComponent *component)
-{    // to be removed later on if unused
-    wclear(component->win);
-    box(component->win, 0, 0);
+{
+    for(int i = 1; i < component->height - 1; i++)
+    {
+        mvwhline(component->win, i, 1, ' ', component->width - 1 - 1);
+    }
 }
 
 void scene_component_refresh(const SceneComponent *component)
 {
     wrefresh(component->win);
+}
+
+void scene_component_render(const SceneComponent *component, int x, int y, chtype ch)
+{
+    mvwaddch(component->win, y, x, ch);
 }
