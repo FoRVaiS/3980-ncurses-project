@@ -35,7 +35,6 @@ typedef struct
 } Server;
 
 typedef void (*ServerPacketHandlerFn)(Server *server, Client *client, const uint8_t *packet);
-typedef void (*ClientPacketHandlerFn)(Client *client, const uint8_t *packet);
 
 int  server_init(Server *server, char *addr, in_port_t port, int *err);
 void server_destroy(Server *server);
@@ -48,7 +47,7 @@ void server_add_player(Server *server, const Connection *conn);
 
 int     client_init(Client *client, char *addr, in_port_t port, int *err);
 void    client_destroy(Client *client);
-int     client_read_packet(Client *client, ClientPacketHandlerFn on_packet, int *err);
+int     client_read_packet(Client *client, uint8_t **packet, int *err);
 ssize_t client_send_packet(Client *client, const uint8_t *packet, int *err);
 
 int  connection_init(Connection *conn, char *addr, in_port_t port, int *err);

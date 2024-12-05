@@ -193,7 +193,7 @@ void client_destroy(Client *client)
     connection_destroy(&client->conn);
 }
 
-int client_read_packet(Client *client, ClientPacketHandlerFn on_packet, int *err)
+int client_read_packet(Client *client, uint8_t **packet, int *err)
 {
     int retval;
     int ready;
@@ -219,11 +219,10 @@ int client_read_packet(Client *client, ClientPacketHandlerFn on_packet, int *err
 
         PacketHeader header;
         PacketHeader storedHeader;
-        uint8_t     *packet;
 
         // Get packet
         *err = 0;
-        if(read_packet(client->conn.sockfd, &packet, &client->conn.addr, &client->conn.addr_len, err) < 0)
+        if(read_packet(client->conn.sockfd, packet, &client->conn.addr, &client->conn.addr_len, err) < 0)
         {
             retval = -2;
             goto exit;
@@ -231,7 +230,7 @@ int client_read_packet(Client *client, ClientPacketHandlerFn on_packet, int *err
 
         // Get header information to handle CONNECT packets
         offset = 0;
-        deserialize_header(&header, packet, &offset);
+        deserialize_header(&header, *packet, &offset);
 
         // Drop if packet is older than the last record packet
         storedHeader = client->history[header.payload_type];
@@ -244,8 +243,8 @@ int client_read_packet(Client *client, ClientPacketHandlerFn on_packet, int *err
         // Update packet history for client
         memcpy(&storedHeader, &header, sizeof(PacketHeader));
 
-        // Process the packet
-        on_packet(client, packet);
+        retval = 1;
+        goto exit;
     }
 
     retval = 0;
