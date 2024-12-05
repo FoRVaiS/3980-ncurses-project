@@ -1,3 +1,5 @@
+// cppcheck-suppress-file unusedStructMember
+
 #ifndef SCENE_H
 #define SCENE_H
 

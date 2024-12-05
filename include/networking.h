@@ -1,8 +1,11 @@
+// cppcheck-suppress-file unusedStructMember
+
 #ifndef NETWORKING_H
 #define NETWORKING_H
 
 #include "packet.h"
 #include <arpa/inet.h>
+#include <netinet/in.h>
 #include <stdint.h>
 
 #define SERVER_MAX_CLIENTS 0xFF  /* 256 */

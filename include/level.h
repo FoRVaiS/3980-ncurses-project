@@ -1,3 +1,5 @@
+// cppcheck-suppress-file unusedStructMember
+
 #ifndef LEVEL_H
 #define LEVEL_H
 

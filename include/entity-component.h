@@ -1,3 +1,5 @@
+// cppcheck-suppress-file unusedStructMember
+
 #ifndef ENTITY_COMPONENT_H
 #define ENTITY_COMPONENT_H
 

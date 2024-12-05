@@ -11,6 +11,8 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+#define CMSG_CONFIRM 2048
+
 int server_init(Server *server, char *addr, in_port_t port, int *err)
 {
     int retval;
@@ -25,7 +27,7 @@ int server_init(Server *server, char *addr, in_port_t port, int *err)
 
     // Bind the socket
     errno = 0;
-    if(bind(server->conn.sockfd, &server->conn.addr, server->conn.addr_len) < 0)
+    if(bind(server->conn.sockfd, (struct sockaddr *)&server->conn.addr, server->conn.addr_len) < 0)
     {
         *err   = errno;
         retval = -2;
@@ -263,7 +265,7 @@ int connection_init(Connection *conn, char *addr, in_port_t port, int *err)
     int retval;
 
     errno        = 0;
-    conn->sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+    conn->sockfd = socket(AF_INET, SOCK_DGRAM | SOCK_CLOEXEC, 0);
     if(errno < 0)
     {
         *err   = errno;
@@ -328,7 +330,7 @@ ssize_t read_packet(int sockfd, uint8_t **packet, struct sockaddr_in *addr, sock
     }
 
     errno   = 0;
-    readval = recvfrom(sockfd, *packet, MTU, MSG_DONTWAIT, addr, addrlen);
+    readval = recvfrom(sockfd, *packet, MTU, MSG_DONTWAIT, (struct sockaddr *)addr, addrlen);
     if(readval < 0)
     {
         *err   = errno;
@@ -360,7 +362,7 @@ ssize_t send_packet(int sockfd, const uint8_t *packet, const struct sockaddr_in 
     packet_len = sizeof(PacketHeader) + header.payload_size;
 
     errno    = 0;
-    nwritten = sendto(sockfd, packet, packet_len, MSG_CONFIRM, addr, *addrlen);
+    nwritten = sendto(sockfd, packet, packet_len, CMSG_CONFIRM, (const struct sockaddr *)addr, *addrlen);
     if(nwritten < 0)
     {
         *err   = errno;

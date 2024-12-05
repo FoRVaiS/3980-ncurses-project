@@ -1,3 +1,5 @@
+// cppcheck-suppress-file unusedStructMember
+
 #ifndef SYSTEMS_H
 #define SYSTEMS_H
 #include "entity.h"

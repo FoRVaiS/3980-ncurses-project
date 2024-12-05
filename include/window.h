@@ -1,3 +1,5 @@
+// cppcheck-suppress-file unusedStructMember
+
 #ifndef WINDOW_H
 #define WINDOW_H
 
