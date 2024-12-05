@@ -32,6 +32,7 @@ Window *window_init(int *err)
     int maxHeight;
 
     initscr();
+    curs_set(0);
 
     getmaxyx(stdscr, maxHeight, maxWidth);
 
