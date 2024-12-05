@@ -57,7 +57,7 @@ void tick(Game *game, long long ms)
         Entity                   *player = &entities[0];
         EntityTransformComponent *player_transform;
 
-        movement_system_process(entities, nentities);
+        movement_system_process(entities, nentities, (uint8_t)(panel->width - 2), (uint8_t)(panel->height - 2));
         render_process(panel, entities, nentities);
 
         // Get player coords

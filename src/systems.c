@@ -4,7 +4,7 @@
 #include "input.h"
 #include "scene-component.h"
 
-void movement_system_process(Entity *entities, uint8_t nentities)
+void movement_system_process(Entity *entities, uint8_t nentities, uint8_t max_x, uint8_t max_y)
 {
     for(uint8_t idx = 0; idx < nentities; idx++)
     {
@@ -22,22 +22,22 @@ void movement_system_process(Entity *entities, uint8_t nentities)
             continue;    // No component found, go to next entity
         }
 
-        if(controller->inputs.RIGHT)
+        if(controller->inputs.RIGHT && transform->x < max_x)
         {
             transform->x++;
         }
 
-        if(controller->inputs.LEFT)
+        if(controller->inputs.LEFT && transform->x > 1)
         {
             transform->x--;
         }
 
-        if(controller->inputs.UP)
+        if(controller->inputs.DOWN && transform->y < max_y)
         {
             transform->y++;
         }
 
-        if(controller->inputs.DOWN)
+        if(controller->inputs.UP && transform->y > 1)
         {
             transform->y--;
         }
